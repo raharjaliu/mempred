@@ -1,3 +1,5 @@
+# ignore, just a testing routine
+
 
 open (IN2, 'pdbtm_unmasked_hval0_just_ss.fasta');
  
