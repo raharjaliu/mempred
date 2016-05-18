@@ -1,0 +1,2 @@
+ID	Number_of_consecutive_non-helix	AA-Sequence
+>Q4PP54|4jq6C|Q4PP54_9BACT 0.95	0	LGETAKANAGSGNAASQQAF
