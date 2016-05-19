@@ -380,11 +380,6 @@ def compute_preliminiary_statistics(dataset, dataset_name, k_gram=3):
 
 def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part_training=.9):
 
-    # part_training_pdbtm = .9
-    # profiles_path = current_path + "/../TM_proteins_profiles/"
-    # output_path = dataset_path
-    # dataset_name = "PDBTM"
-
     file_list = os.listdir(profiles_path)
     file_list = [profiles_path + this_file for this_file in file_list if 'blastPsiMat' in this_file]
 
@@ -401,19 +396,10 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
 
         (this_pos_index, this_neg_index) = create_initial_profile_ranges(this_ss)
 
-        # print "seq_id: %s" % this_file_seq_id
-        # print this_ss
-        # print this_pos_index
-        # print this_neg_index
-
         this_pos_index = extract_legal_profile_ranges(this_pos_index, profile_length=20)
         this_neg_index = extract_legal_profile_ranges(this_neg_index, profile_length=20)
 
-        # print "extracted"
-        # print this_pos_index
-        # print this_neg_index
-
-        print "=" * 10
+        # print "=" * 10
 
         in_buff = open(this_file)
         in_content = in_buff.readlines()
@@ -424,34 +410,32 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
         content_lines = in_content[3:(-6)]
 
         for this_index in this_pos_index:
-            print this_index
+            # print this_index
             this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
 
             this_profile = header + this_content + footer
             this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
 
-            print this_profile
-            print this_seq
+            # print this_profile
+            # print this_seq
 
             pos_profiles[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_profile
             pos_seq[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_seq
 
         for this_index in this_neg_index:
-            print this_index
+            # print this_index
             this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
 
             this_profile = header + this_content + footer
             this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
 
-            print this_profile
-            print this_seq
+            # print this_profile
+            # print this_seq
 
             neg_profiles[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_profile
             neg_seq[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_seq
 
-            ## TODO write profiles onto file
-
-        print '=' * 20
+        # print '=' * 20
 
     len_dev_set_pos = int(part_training * len(pos_profiles.keys()))
     len_dev_set_neg = int(part_training * len(neg_profiles.keys()))
@@ -484,6 +468,13 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
         this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name] + "\n"
         fileout_string_test_neg += this_string
         fileout_string_test_neg_list += (">" + seq_name + "\n")
+
+
+    print "DATASET: %s" % dataset_name
+    print "NUMBER OF SEQ IN POSITIVE TRAINING SET: %d" % len_dev_set_pos
+    print "NUMBER OF SEQ IN POSITIVE TESTING SET: %d" % (len(pos_profiles.keys()) - len_dev_set_pos)
+    print "NUMBER OF SEQ IN NEGATIVE TRAINING SET: %d" % len_dev_set_neg
+    print "NUMBER OF SEQ IN NEGATIVE TESTING SET: %d" % (len(neg_profiles.keys()) - len_dev_set_neg)
 
     text_file = open(output_path + dataset_name + "_pos_dev.profile", "w")
     text_file.write(fileout_string_dev_pos[:-1])
