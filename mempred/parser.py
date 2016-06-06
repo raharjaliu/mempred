@@ -396,9 +396,13 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
 
         (this_pos_index, this_neg_index) = create_initial_profile_ranges(this_ss)
 
+
         this_pos_index = extract_legal_profile_ranges(this_pos_index, profile_length=20)
         this_neg_index = extract_legal_profile_ranges(this_neg_index, profile_length=20)
 
+        # print "this_ss: %s" % this_ss
+        # print this_pos_index
+        # print this_neg_index
         # print "=" * 10
 
         in_buff = open(this_file)
@@ -410,11 +414,18 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
         content_lines = in_content[3:(-6)]
 
         for this_index in this_pos_index:
+
+            # print "#" * 10
+            # print this_index
+            # print "#" * 10
+
             # print this_index
             this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
 
             this_profile = header + this_content + footer
-            this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
+            # this_profile = header + this_content
+            # this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
+            this_seq = sequence_dict[this_file_seq_id][0][this_index[0]:(this_index[1] + 1)]
 
             # print this_profile
             # print this_seq
@@ -423,11 +434,18 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
             pos_seq[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_seq
 
         for this_index in this_neg_index:
+
+            # print "#" * 10
+            # print this_index
+            # print "#" * 10
+
             # print this_index
             this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
 
             this_profile = header + this_content + footer
-            this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
+            # this_profile = header + this_content
+            # this_seq = sequence_dict[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
+            this_seq = sequence_dict[this_file_seq_id][0][this_index[0]:(this_index[1] + 1)]
 
             # print this_profile
             # print this_seq
@@ -450,22 +468,22 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
     fileout_string_test_neg_list = ""
 
     for seq_name in pos_profiles.keys()[:len_dev_set_pos]:
-        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name] + "\n"
+        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
         fileout_string_dev_pos += this_string
         fileout_string_dev_pos_list += (">" + seq_name + "\n")
 
     for seq_name in pos_profiles.keys()[len_dev_set_pos:]:
-        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name] + "\n"
+        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
         fileout_string_test_pos += this_string
         fileout_string_test_pos_list += (">" + seq_name + "\n")
 
     for seq_name in neg_profiles.keys()[:len_dev_set_neg]:
-        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name] + "\n"
+        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
         fileout_string_dev_neg += this_string
         fileout_string_dev_neg_list += (">" + seq_name + "\n")
 
     for seq_name in neg_profiles.keys()[len_dev_set_neg:]:
-        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name] + "\n"
+        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
         fileout_string_test_neg += this_string
         fileout_string_test_neg_list += (">" + seq_name + "\n")
 
@@ -569,7 +587,6 @@ if __name__ == "__main__":
     # print opm_dict_real_key
     # print pdbtm_dict_real_key
 
-
     ## create profile dict from original profile maps
 
     part_training_pdbtm = .9
@@ -579,145 +596,5 @@ if __name__ == "__main__":
 
     write_profiles(profiles_path, dataset_path, "PDBTM", pdbtm_dict_real_key, part_training=0.9)
     write_profiles(profiles_path, dataset_path, "OPM", opm_dict_real_key, part_training=0.9)
-
-
-    #
-    # file_list = os.listdir(profiles_path)
-    # file_list = [profiles_path + this_file for this_file in file_list if 'blastPsiMat' in this_file]
-    #
-    # pos_profiles_pdbtm = {}
-    # neg_profiles_pdbtm = {}
-    #
-    # pos_seq_pdbtm = {}
-    # neg_seq_pdbtm = {}
-    #
-    # for this_file in file_list:
-    #
-    #     this_file_seq_id = this_file.split('/')[-1].split('.')[0].split('_')[1]
-    #     (this_seq, this_ss) = pdbtm_dict_real_key[this_file_seq_id]
-    #
-    #     (this_pos_index, this_neg_index) = create_initial_profile_ranges(this_ss)
-    #
-    #     # print "seq_id: %s" % this_file_seq_id
-    #     # print this_ss
-    #     # print this_pos_index
-    #     # print this_neg_index
-    #
-    #     this_pos_index = extract_legal_profile_ranges(this_pos_index, profile_length=20)
-    #     this_neg_index = extract_legal_profile_ranges(this_neg_index, profile_length=20)
-    #
-    #     # print "extracted"
-    #     # print this_pos_index
-    #     # print this_neg_index
-    #
-    #     print "=" * 10
-    #
-    #     in_buff = open(this_file)
-    #     in_content = in_buff.readlines()
-    #
-    #     header = "".join(in_content[0:3])
-    #     footer = "".join(in_content[-6:])
-    #
-    #     content_lines = in_content[3:(-6)]
-    #
-    #     for this_index in this_pos_index:
-    #
-    #         print this_index
-    #         this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
-    #
-    #         this_profile = header + this_content + footer
-    #         this_seq = pdbtm_dict_real_key[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
-    #
-    #         print this_profile
-    #         print this_seq
-    #
-    #         pos_profiles_pdbtm[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_profile
-    #         pos_seq_pdbtm[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_seq
-    #
-    #     for this_index in this_neg_index:
-    #
-    #         print this_index
-    #         this_content = "".join(content_lines[this_index[0]:(this_index[1] + 1)])
-    #
-    #         this_profile = header + this_content + footer
-    #         this_seq = pdbtm_dict_real_key[this_file_seq_id][0][(this_index[0] - 1):this_index[1]]
-    #
-    #         print this_profile
-    #         print this_seq
-    #
-    #         neg_profiles_pdbtm[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_profile
-    #         neg_seq_pdbtm[this_file_seq_id + "_" + str(this_index[0]) + "_" + str(this_index[1])] = this_seq
-    #
-    #
-    #     print '=' * 20
-    #
-    # len_dev_set_pos = int(part_training_opm * len(pos_profiles_pdbtm.keys()))
-    # len_dev_set_neg = int(part_training_opm * len(neg_profiles_pdbtm.keys()))
-    #
-    # fileout_string_dev_pos = ""
-    # fileout_string_dev_pos_list = ""
-    # fileout_string_test_pos = ""
-    # fileout_string_test_pos_list = ""
-    # fileout_string_dev_neg = ""
-    # fileout_string_dev_neg_list = ""
-    # fileout_string_test_neg = ""
-    # fileout_string_test_neg_list = ""
-    #
-    # for seq_name in pos_profiles_pdbtm.keys()[:len_dev_set_pos]:
-    #
-    #     this_string = ">" + seq_name + "\n" + pos_seq_pdbtm[seq_name] + "\n" + pos_profiles_pdbtm[seq_name] + "\n"
-    #     fileout_string_dev_pos += this_string
-    #     fileout_string_dev_pos_list += (">" + seq_name + "\n")
-    #
-    # for seq_name in pos_profiles_pdbtm.keys()[len_dev_set_pos:]:
-    #
-    #     this_string = ">" + seq_name + "\n" + pos_seq_pdbtm[seq_name] + "\n" + pos_profiles_pdbtm[seq_name] + "\n"
-    #     fileout_string_test_pos += this_string
-    #     fileout_string_test_pos_list += (">" + seq_name + "\n")
-    #
-    # for seq_name in neg_profiles_pdbtm.keys()[:len_dev_set_neg]:
-    #     this_string = ">" + seq_name + "\n" + neg_seq_pdbtm[seq_name] + "\n" + neg_profiles_pdbtm[seq_name] + "\n"
-    #     fileout_string_dev_neg += this_string
-    #     fileout_string_dev_neg_list += (">" + seq_name + "\n")
-    #
-    # for seq_name in neg_profiles_pdbtm.keys()[len_dev_set_neg:]:
-    #     this_string = ">" + seq_name + "\n" + neg_seq_pdbtm[seq_name] + "\n" + neg_profiles_pdbtm[seq_name] + "\n"
-    #     fileout_string_test_neg += this_string
-    #     fileout_string_test_neg_list += (">" + seq_name + "\n")
-    #
-    # text_file = open(output_path + dataset_name + "_pos_dev.profile", "w")
-    # text_file.write(fileout_string_dev_pos[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_pos_dev.list", "w")
-    # text_file.write(fileout_string_dev_pos_list[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_pos_test.profile", "w")
-    # text_file.write(fileout_string_dev_pos[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_pos_test.list", "w")
-    # text_file.write(fileout_string_dev_pos_list[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_neg_dev.profile", "w")
-    # text_file.write(fileout_string_dev_neg[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_neg_dev.list", "w")
-    # text_file.write(fileout_string_dev_neg_list[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_neg_test.profile", "w")
-    # text_file.write(fileout_string_dev_neg[:-1])
-    # text_file.close()
-    #
-    # text_file = open(output_path + dataset_name + "_neg_test.list", "w")
-    # text_file.write(fileout_string_dev_neg_list[:-1])
-    # text_file.close()
-    #
-    # # print neg_profiles_pdbtm
-    # # print pos_profiles_pdbtm
 
     print "done"
