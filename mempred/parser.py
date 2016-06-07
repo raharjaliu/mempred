@@ -458,73 +458,165 @@ def write_profiles(profiles_path, output_path, dataset_name, sequence_dict, part
     len_dev_set_pos = int(part_training * len(pos_profiles.keys()))
     len_dev_set_neg = int(part_training * len(neg_profiles.keys()))
 
-    fileout_string_dev_pos = ""
-    fileout_string_dev_pos_list = ""
-    fileout_string_test_pos = ""
-    fileout_string_test_pos_list = ""
-    fileout_string_dev_neg = ""
-    fileout_string_dev_neg_list = ""
-    fileout_string_test_neg = ""
-    fileout_string_test_neg_list = ""
+    ## NEW TEST
 
-    for seq_name in pos_profiles.keys()[:len_dev_set_pos]:
-        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
-        fileout_string_dev_pos += this_string
-        fileout_string_dev_pos_list += (">" + seq_name + "\n")
+    dev_seqs = pos_profiles.keys()[:len_dev_set_pos] + neg_profiles.keys()[:len_dev_set_neg]
+    rd.shuffle(dev_seqs)
+    test_seqs = pos_profiles.keys()[len_dev_set_pos:] + neg_profiles.keys()[len_dev_set_neg:]
+    rd.shuffle(test_seqs)
 
-    for seq_name in pos_profiles.keys()[len_dev_set_pos:]:
-        this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
-        fileout_string_test_pos += this_string
-        fileout_string_test_pos_list += (">" + seq_name + "\n")
+    fileout_string_dev = ""
+    fileout_string_dev_list = ""
+    arff_dev_id = "@attribute identifier {"
+    arff_dev_dat = "@data"
+    fileout_string_dev_arff = ""
 
-    for seq_name in neg_profiles.keys()[:len_dev_set_neg]:
-        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
-        fileout_string_dev_neg += this_string
-        fileout_string_dev_neg_list += (">" + seq_name + "\n")
+    fileout_string_test = ""
+    fileout_string_test_list = ""
+    arff_test_id = "@attribute identifier {"
+    arff_test_dat = "@data"
+    fileout_string_test_arff = ""
 
-    for seq_name in neg_profiles.keys()[len_dev_set_neg:]:
-        this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
-        fileout_string_test_neg += this_string
-        fileout_string_test_neg_list += (">" + seq_name + "\n")
+    for seq_name in dev_seqs:
 
+        arff_dev_id += (seq_name + ", ")
+        fileout_string_dev_list += (">" + seq_name + "\n")
+
+        if seq_name in pos_profiles.keys():
+
+            fileout_string_dev += (">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name])
+            arff_dev_dat += ("\n" + seq_name + ",positive")
+
+        else:
+
+            fileout_string_dev += (">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name])
+            arff_dev_dat += ("\n" + seq_name + ",negative")
+
+    fileout_string_dev_list = fileout_string_dev_list[:-1]
+    arff_dev_id = arff_dev_id[:-2] + "}"
+    fileout_string_dev_arff = "@relation docs\n" + arff_dev_id + "\n@attribute class {positive,negative}\n" + arff_dev_dat
+
+    text_file = open(output_path + dataset_name + "_dev.profile", "w")
+    text_file.write(fileout_string_dev)
+    text_file.close()
+
+    text_file = open(output_path + dataset_name + "_dev.arff", "w")
+    text_file.write(fileout_string_dev_arff)
+    text_file.close()
+
+    text_file = open(output_path + dataset_name + "_dev.list", "w")
+    text_file.write(fileout_string_dev_list)
+    text_file.close()
+
+    for seq_name in test_seqs:
+
+        arff_test_id += (seq_name + ", ")
+        fileout_string_test_list += (">" + seq_name + "\n")
+
+        if seq_name in pos_profiles.keys():
+
+            fileout_string_test += (">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name])
+            arff_test_dat += ("\n" + seq_name + ",positive")
+
+        else:
+
+            fileout_string_test += (">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name])
+            arff_test_dat += ("\n" + seq_name + ",negative")
+
+    fileout_string_test_list = fileout_string_test_list[:-1]
+    arff_test_id = arff_test_id[:-2] + "}"
+    fileout_string_test_arff = "@relation docs\n" + arff_test_id + "\n@attribute class {positive,negative}\n" + arff_test_dat
+
+    text_file = open(output_path + dataset_name + "_test.profile", "w")
+    text_file.write(fileout_string_test)
+    text_file.close()
+
+    text_file = open(output_path + dataset_name + "_test.arff", "w")
+    text_file.write(fileout_string_test_arff)
+    text_file.close()
+
+    text_file = open(output_path + dataset_name + "_test.list", "w")
+    text_file.write(fileout_string_test_list)
+    text_file.close()
 
     print "DATASET: %s" % dataset_name
     print "NUMBER OF SEQ IN POSITIVE TRAINING SET: %d" % len_dev_set_pos
-    print "NUMBER OF SEQ IN POSITIVE TESTING SET: %d" % (len(pos_profiles.keys()) - len_dev_set_pos)
     print "NUMBER OF SEQ IN NEGATIVE TRAINING SET: %d" % len_dev_set_neg
+    print "NUMBER OF SEQ IN POSITIVE TESTING SET: %d" % (len(pos_profiles.keys()) - len_dev_set_pos)
     print "NUMBER OF SEQ IN NEGATIVE TESTING SET: %d" % (len(neg_profiles.keys()) - len_dev_set_neg)
+    print "TOTAL NUMBER OF SEQ IN TRAINING SET: %d" % (len_dev_set_pos + len_dev_set_neg)
+    print "TOTAL NUMBER OF SEQ IN TESTING SET: %d" % (len(pos_profiles.keys()) + len(neg_profiles.keys()) - len_dev_set_pos - len_dev_set_neg)
 
-    text_file = open(output_path + dataset_name + "_pos_dev.profile", "w")
-    text_file.write(fileout_string_dev_pos[:-1])
-    text_file.close()
 
-    text_file = open(output_path + dataset_name + "_pos_dev.list", "w")
-    text_file.write(fileout_string_dev_pos_list[:-1])
-    text_file.close()
+    ## END OF NEW TEST
 
-    text_file = open(output_path + dataset_name + "_pos_test.profile", "w")
-    text_file.write(fileout_string_dev_pos[:-1])
-    text_file.close()
-
-    text_file = open(output_path + dataset_name + "_pos_test.list", "w")
-    text_file.write(fileout_string_dev_pos_list[:-1])
-    text_file.close()
-
-    text_file = open(output_path + dataset_name + "_neg_dev.profile", "w")
-    text_file.write(fileout_string_dev_neg[:-1])
-    text_file.close()
-
-    text_file = open(output_path + dataset_name + "_neg_dev.list", "w")
-    text_file.write(fileout_string_dev_neg_list[:-1])
-    text_file.close()
-
-    text_file = open(output_path + dataset_name + "_neg_test.profile", "w")
-    text_file.write(fileout_string_dev_neg[:-1])
-    text_file.close()
-
-    text_file = open(output_path + dataset_name + "_neg_test.list", "w")
-    text_file.write(fileout_string_dev_neg_list[:-1])
-    text_file.close()
+    # fileout_string_dev_pos = ""
+    # fileout_string_dev_pos_list = ""
+    # fileout_string_test_pos = ""
+    # fileout_string_test_pos_list = ""
+    # fileout_string_dev_neg = ""
+    # fileout_string_dev_neg_list = ""
+    # fileout_string_test_neg = ""
+    # fileout_string_test_neg_list = ""
+    #
+    # for seq_name in pos_profiles.keys()[:len_dev_set_pos]:
+    #     this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
+    #     fileout_string_dev_pos += this_string
+    #     fileout_string_dev_pos_list += (">" + seq_name + "\n")
+    #
+    # for seq_name in pos_profiles.keys()[len_dev_set_pos:]:
+    #     this_string = ">" + seq_name + "\n" + pos_seq[seq_name] + "\n" + pos_profiles[seq_name]
+    #     fileout_string_test_pos += this_string
+    #     fileout_string_test_pos_list += (">" + seq_name + "\n")
+    #
+    # for seq_name in neg_profiles.keys()[:len_dev_set_neg]:
+    #     this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
+    #     fileout_string_dev_neg += this_string
+    #     fileout_string_dev_neg_list += (">" + seq_name + "\n")
+    #
+    # for seq_name in neg_profiles.keys()[len_dev_set_neg:]:
+    #     this_string = ">" + seq_name + "\n" + neg_seq[seq_name] + "\n" + neg_profiles[seq_name]
+    #     fileout_string_test_neg += this_string
+    #     fileout_string_test_neg_list += (">" + seq_name + "\n")
+    #
+    #
+    # print "DATASET: %s" % dataset_name
+    # print "NUMBER OF SEQ IN POSITIVE TRAINING SET: %d" % len_dev_set_pos
+    # print "NUMBER OF SEQ IN POSITIVE TESTING SET: %d" % (len(pos_profiles.keys()) - len_dev_set_pos)
+    # print "NUMBER OF SEQ IN NEGATIVE TRAINING SET: %d" % len_dev_set_neg
+    # print "NUMBER OF SEQ IN NEGATIVE TESTING SET: %d" % (len(neg_profiles.keys()) - len_dev_set_neg)
+    #
+    # text_file = open(output_path + dataset_name + "_pos_dev.profile", "w")
+    # text_file.write(fileout_string_dev_pos[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_pos_dev.list", "w")
+    # text_file.write(fileout_string_dev_pos_list[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_pos_test.profile", "w")
+    # text_file.write(fileout_string_dev_pos[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_pos_test.list", "w")
+    # text_file.write(fileout_string_dev_pos_list[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_neg_dev.profile", "w")
+    # text_file.write(fileout_string_dev_neg[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_neg_dev.list", "w")
+    # text_file.write(fileout_string_dev_neg_list[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_neg_test.profile", "w")
+    # text_file.write(fileout_string_dev_neg[:-1])
+    # text_file.close()
+    #
+    # text_file = open(output_path + dataset_name + "_neg_test.list", "w")
+    # text_file.write(fileout_string_dev_neg_list[:-1])
+    # text_file.close()
 
 
 if __name__ == "__main__":
@@ -544,8 +636,8 @@ if __name__ == "__main__":
     # parse PDBTM file and represent it as a map
     pdbtm_seq_dict = parse_sequence_file(pdbtm_path)
 
-    print opm_seq_dict
-    print pdbtm_seq_dict
+    # print opm_seq_dict
+    # print pdbtm_seq_dict
 
     ## Compute basic statistics for both dataset
     # compute_preliminiary_statistics(opm_seq_dict, "OPM", k_gram=3)
@@ -553,8 +645,6 @@ if __name__ == "__main__":
 
 
     ## Divide both dataset into training and test sets
-
-    part_training_pdbtm = .5
 
     # delete existing file in dataset folder
 
