@@ -1,0 +1,13 @@
+- Why is it important to do redundancy reduction?
+
+Redundancy in data introduces bias. The purpose of machine learning is to create a model that would generally explain the data. Having redundanies skew the data towards the redundant elements that the generalization of the data so that the generalization of the data is reliable.
+
+- What is HSSP curve?
+
+TODO
+
+- why is independent testing done?
+
+To make sure that the data is generalizable (? not very strong argument)
+
+
